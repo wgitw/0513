@@ -1,16 +1,26 @@
 name: Semgrep Full Scan
+
 on:
   workflow_dispatch:
+
 jobs:
   semgrep-full:
-      runs-on: ubuntu-latest
-      container:
-        image: returntocorp/semgrep
-      steps:
-        - name: clone application source code
-          uses: actions/checkout@v3
-        - name: full scan
-          run: |
-            semgrep \
-              --output report.log \
-              --config="p/default"
+    runs-on: ubuntu-latest
+    container:
+      image: returntocorp/semgrep
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Run Semgrep full scan
+        run: |
+          semgrep \
+            --config="p/default" \
+            --output report.sarif \
+            --sarif
+
+      - name: Upload scan report
+        uses: actions/upload-artifact@v3
+        with:
+          name: semgrep-report
+          path: report.sarif
